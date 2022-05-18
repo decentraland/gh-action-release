@@ -2,11 +2,11 @@ name: 'release'
 on:
   workflow_dispatch:
     inputs:
-          dry_run:
-            description: If true, it doesn't create the release
-            type: boolean
-            required: false
-            default: false
+        dry_run:
+          description: dry run
+          type: boolean
+          required: false
+          default: false
 
 jobs:
   release: # make sure the action works on a clean machine without building

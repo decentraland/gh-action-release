@@ -2,7 +2,7 @@ name: 'release'
 on: [workflow_dispatch]
 
 jobs:
-  test: # make sure the action works on a clean machine without building
+  release: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     permissions: write-all
     steps:

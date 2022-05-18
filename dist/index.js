@@ -50,7 +50,7 @@ function run() {
         });
         try {
             // Get the JSON webhook payload for the event that triggered the workflow
-            const owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.name) !== null && _b !== void 0 ? _b : '';
+            const owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.login) !== null && _b !== void 0 ? _b : '';
             const repo = (_d = (_c = github.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) !== null && _d !== void 0 ? _d : '';
             core.setOutput('context', github.context);
             // Fail if owner or repo are not filled properly

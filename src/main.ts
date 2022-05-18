@@ -15,7 +15,7 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    const owner = github.context.payload.repository?.owner.name ?? ''
+    const owner = github.context.payload.repository?.owner.login ?? ''
     const repo = github.context.payload.repository?.name ?? ''
     core.setOutput('context', github.context)
 

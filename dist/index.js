@@ -64,7 +64,13 @@ function run() {
             // Calculate new tag depending on commit messages
             const newTag = calculateNewTag(commitsMessages, lastTag);
             // Create a release
-            // createRelease(octokit, owner, repo, newTag)
+            if (dryRun) {
+                core.info('No se releasea');
+            }
+            else {
+                core.info('Se releasea');
+            }
+            // createRelease(octokit, owner, repo, newTag, dryRun)
         }
         catch (error) {
             if (error instanceof Error)
@@ -157,7 +163,7 @@ function bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch) {
     }
     return lastTag;
 }
-function createRelease(octokit, owner, repo, newTag) {
+function createRelease(octokit, owner, repo, newTag, dryRun) {
     octokit.rest.repos.createRelease({
         owner,
         repo,

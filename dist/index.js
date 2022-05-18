@@ -53,10 +53,8 @@ function run() {
             // Get the JSON webhook payload for the event that triggered the workflow
             const owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.login) !== null && _b !== void 0 ? _b : '';
             const repo = (_d = (_c = github.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) !== null && _d !== void 0 ? _d : '';
-            core.setOutput('context', github.context);
-            core.setOutput('dry', dryRun);
-            core.info('Try info');
-            core.info(dryRun);
+            core.info(`Context: ${github.context}`);
+            core.info(`Dry run: ${dryRun}`);
             // Fail if owner or repo are not filled properly
             checkRepoAndOwner(owner, repo);
             // Get last tag
@@ -92,7 +90,7 @@ function getLastTag(octokit, owner, repo) {
             repo
         });
         const lastTag = latestRelease.data.tag_name;
-        core.setOutput('lastTag', lastTag);
+        core.info(`Last tag: ${lastTag}`);
         // Fail if tag is not semver
         if (!lastTag.match(SEMVER_REGEX_STRING)) {
             throw new Error(`Latest release tag name is not semver. Found: ${lastTag}`);
@@ -112,8 +110,7 @@ function getCommitMessages(octokit, owner, repo, lastTag) {
         }, response => response.data.commits);
         // Extract messages
         const commitsMessages = commits.map(commit => commit.commit.message);
-        core.setOutput('commits', commitsMessages);
-        core.setOutput('commitsLength', commitsMessages.length);
+        core.info(`Commits length: ${commitsMessages.length}`);
         return commitsMessages;
     });
 }
@@ -133,12 +130,12 @@ function calculateNewTag(commitsMessages, lastTag) {
             bumpMajor = true;
         }
     }
-    core.setOutput('bumpMajor', bumpMajor);
-    core.setOutput('bumpMinor', bumpMinor);
-    core.setOutput('bumpPatch', bumpPatch);
+    core.debug(`Bump major: ${bumpMajor}`);
+    core.debug(`Bump minor: ${bumpMinor}`);
+    core.debug(`Bump patch: ${bumpPatch}`);
     // Bump the version
     const newTag = bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch);
-    core.setOutput('newTag', newTag);
+    core.info(`New tag ${newTag}`);
     return newTag;
 }
 function bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch) {
@@ -167,6 +164,7 @@ function createRelease(octokit, owner, repo, newTag) {
         tag_name: newTag,
         generate_release_notes: true
     });
+    core.info(`Release ${newTag} created`);
 }
 
 

@@ -18,10 +18,8 @@ async function run(): Promise<void> {
     // Get the JSON webhook payload for the event that triggered the workflow
     const owner = github.context.payload.repository?.owner.login ?? ''
     const repo = github.context.payload.repository?.name ?? ''
-    core.setOutput('context', github.context)
-    core.setOutput('dry', dryRun)
-    core.info('Try info')
-    core.info(dryRun)
+    core.info(`Context: ${github.context}`)
+    core.info(`Dry run: ${dryRun}`)
 
     // Fail if owner or repo are not filled properly
     checkRepoAndOwner(owner, repo)
@@ -65,7 +63,7 @@ async function getLastTag(
     repo
   })
   const lastTag = latestRelease.data.tag_name
-  core.setOutput('lastTag', lastTag)
+  core.info(`Last tag: ${lastTag}`)
 
   // Fail if tag is not semver
   if (!lastTag.match(SEMVER_REGEX_STRING)) {
@@ -90,8 +88,7 @@ async function getCommitMessages(octokit: Octokit, owner: string, repo: string, 
 
   // Extract messages
   const commitsMessages = commits.map(commit => commit.commit.message)
-  core.setOutput('commits', commitsMessages)
-  core.setOutput('commitsLength', commitsMessages.length)
+  core.info(`Commits length: ${commitsMessages.length}`)
 
   return commitsMessages
 }
@@ -110,13 +107,13 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
       bumpMajor = true
     }
   }
-  core.setOutput('bumpMajor', bumpMajor)
-  core.setOutput('bumpMinor', bumpMinor)
-  core.setOutput('bumpPatch', bumpPatch)
+  core.debug(`Bump major: ${bumpMajor}`)
+  core.debug(`Bump minor: ${bumpMinor}`)
+  core.debug(`Bump patch: ${bumpPatch}`)
 
   // Bump the version
   const newTag = bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch)
-  core.setOutput('newTag', newTag)
+  core.info(`New tag ${newTag}`)
   return newTag
 }
 
@@ -145,4 +142,5 @@ function createRelease(octokit: Octokit, owner: string, repo: string, newTag: st
     tag_name: newTag,
     generate_release_notes: true
   })
+  core.info(`Release ${newTag} created`)
 }

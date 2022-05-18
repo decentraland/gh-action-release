@@ -19,12 +19,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: ${{ github.event.inputs.dry_run }}
-      - run: echo "Dry run ${{ github.event.inputs.dry_run }}"
-      - run: echo "Github context ${{ steps.result.outputs.context }}"
-      - run: echo "Dry ${{ steps.result.outputs.dry }}"
-      - run: echo "Last tag ${{ steps.result.outputs.lastTag }}"
-      - run: echo "Commits found ${{ steps.result.outputs.commitsLength }}"
-      - run: echo "Major being bumped ${{ steps.result.outputs.bumpMajor }}"
-      - run: echo "Minor being bumped ${{ steps.result.outputs.bumpMinor }}"
-      - run: echo "Patch being bumped ${{ steps.result.outputs.bumpPatch }}"
-      - run: echo "New tag ${{ steps.result.outputs.newTag }}"

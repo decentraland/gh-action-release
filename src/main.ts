@@ -19,7 +19,7 @@ async function run(): Promise<void> {
     // const repo = github.context.payload.repository?.name ?? ''
     core.setOutput('context', github.context.payload)
     core.setOutput('repository', github.context.payload.repository)
-    core.setOutput('owner', github.context.payload.repository?.owner.login)
+    core.setOutput('owner', owner)
 
     // Fail if owner or repo are not filled properly
     // const context = JSON.stringify(github.context)

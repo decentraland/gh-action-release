@@ -62,7 +62,7 @@ function run() {
             // Calculate new tag depending on commit messages
             const newTag = calculateNewTag(commitsMessages, lastTag);
             // Create a release
-            // createRelease(octokit, owner, repo, newTag)
+            createRelease(octokit, owner, repo, newTag);
         }
         catch (error) {
             if (error instanceof Error)

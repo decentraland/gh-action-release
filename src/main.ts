@@ -32,7 +32,7 @@ async function run(): Promise<void> {
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    // createRelease(octokit, owner, repo, newTag)
+    createRelease(octokit, owner, repo, newTag)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

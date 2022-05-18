@@ -6,7 +6,8 @@ import {paginateRest} from '@octokit/plugin-paginate-rest'
 const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$'
 
 async function run(): Promise<void> {
-  const token = core.getInput('GITHUB_TOKEN')
+  const token = core.getInput('github_token')
+  const dryRun = core.getInput('dry_run')
 
   const PluginOctokit = Octokit.plugin(paginateRest)
   const octokit = new PluginOctokit({
@@ -18,6 +19,9 @@ async function run(): Promise<void> {
     const owner = github.context.payload.repository?.owner.login ?? ''
     const repo = github.context.payload.repository?.name ?? ''
     core.setOutput('context', github.context)
+    core.setOutput('dry', dryRun)
+    core.info('Try info')
+    core.info(dryRun)
 
     // Fail if owner or repo are not filled properly
     checkRepoAndOwner(owner, repo)
@@ -32,7 +36,7 @@ async function run(): Promise<void> {
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    createRelease(octokit, owner, repo, newTag)
+    // createRelease(octokit, owner, repo, newTag)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

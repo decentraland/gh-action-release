@@ -1,5 +1,12 @@
 name: 'release'
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+    inputs:
+          dry_run:
+            description: If true, it doesn't create the release
+            type: boolean
+            required: false
+            default: false
 
 jobs:
   release: # make sure the action works on a clean machine without building
@@ -10,11 +17,14 @@ jobs:
       - uses: ./
         id: result
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo "Github context ${{ steps.result.outputs.context}}"
-      - run: echo "Last tag ${{ steps.result.outputs.lastTag}}"
-      - run: echo "Commits found ${{ steps.result.outputs.commitsLength}}"
-      - run: echo "Major being bumped ${{ steps.result.outputs.bumpMajor}}"
-      - run: echo "Minor being bumped ${{ steps.result.outputs.bumpMinor}}"
-      - run: echo "Patch being bumped ${{ steps.result.outputs.bumpPatch}}"
-      - run: echo "New tag ${{ steps.result.outputs.newTag}}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: ${{ github.event.inputs.dry_run }}
+      - run: echo "Dry run ${{ github.event.inputs.dry_run }}"
+      - run: echo "Github context ${{ steps.result.outputs.context }}"
+      - run: echo "Dry ${{ steps.result.outputs.dry }}"
+      - run: echo "Last tag ${{ steps.result.outputs.lastTag }}"
+      - run: echo "Commits found ${{ steps.result.outputs.commitsLength }}"
+      - run: echo "Major being bumped ${{ steps.result.outputs.bumpMajor }}"
+      - run: echo "Minor being bumped ${{ steps.result.outputs.bumpMinor }}"
+      - run: echo "Patch being bumped ${{ steps.result.outputs.bumpPatch }}"
+      - run: echo "New tag ${{ steps.result.outputs.newTag }}"

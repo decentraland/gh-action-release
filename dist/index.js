@@ -44,7 +44,7 @@ function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         const token = core.getInput('github_token');
-        const dryRun = core.getInput('dry_run');
+        const dryRun = core.getInput('dry_run') === 'true';
         const PluginOctokit = rest_1.Octokit.plugin(plugin_paginate_rest_1.paginateRest);
         const octokit = new PluginOctokit({
             auth: token

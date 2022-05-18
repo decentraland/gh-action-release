@@ -7,7 +7,7 @@ const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$'
 
 async function run(): Promise<void> {
   const token = core.getInput('github_token')
-  const dryRun = core.getInput('dry_run')
+  const dryRun = core.getInput('dry_run') === 'true'
 
   const PluginOctokit = Octokit.plugin(paginateRest)
   const octokit = new PluginOctokit({

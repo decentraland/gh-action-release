@@ -15,27 +15,27 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    const owner = github.context.payload.repository?.owner?.login ?? ''
-    const repo = github.context.payload.repository?.name ?? ''
+    // const owner = github.context.payload.repository?.owner?.login ?? ''
+    // const repo = github.context.payload.repository?.name ?? ''
     core.setOutput('context', github.context)
 
     // Fail if owner or repo are not filled properly
-    const context = JSON.stringify(github.context)
-    if (owner === '') {
-      throw new Error(`Owner retrieved from payload is not valid. Context ${context}`)
-    }
-    if (repo === '') {
-      throw new Error(`Repo retrieved from payload is not valid. Context ${context}`)
-    }
+    // const context = JSON.stringify(github.context)
+    // if (owner === '') {
+    //   throw new Error(`Owner retrieved from payload is not valid. Context ${context}`)
+    // }
+    // if (repo === '') {
+    //   throw new Error(`Repo retrieved from payload is not valid. Context ${context}`)
+    // }
 
-    // Get last tag
-    const lastTag = await getLastTag(octokit, owner, repo)
+    // // Get last tag
+    // const lastTag = await getLastTag(octokit, owner, repo)
 
-    // Get commits between last tag and now
-    const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
+    // // Get commits between last tag and now
+    // const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
 
-    // Calculate new tag depending on commit messages
-    const newTag = calculateNewTag(commitsMessages, lastTag)
+    // // Calculate new tag depending on commit messages
+    // const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
     // createRelease(octokit, owner, repo, newTag)

@@ -41,7 +41,6 @@ const rest_1 = __nccwpck_require__(5375);
 const plugin_paginate_rest_1 = __nccwpck_require__(4193);
 const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$';
 function run() {
-    var _a, _b, _c, _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         const token = core.getInput('GITHUB_TOKEN');
         const PluginOctokit = rest_1.Octokit.plugin(plugin_paginate_rest_1.paginateRest);
@@ -50,23 +49,23 @@ function run() {
         });
         try {
             // Get the JSON webhook payload for the event that triggered the workflow
-            const owner = (_c = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner) === null || _b === void 0 ? void 0 : _b.login) !== null && _c !== void 0 ? _c : '';
-            const repo = (_e = (_d = github.context.payload.repository) === null || _d === void 0 ? void 0 : _d.name) !== null && _e !== void 0 ? _e : '';
+            // const owner = github.context.payload.repository?.owner?.login ?? ''
+            // const repo = github.context.payload.repository?.name ?? ''
             core.setOutput('context', github.context);
             // Fail if owner or repo are not filled properly
-            const context = JSON.stringify(github.context);
-            if (owner === '') {
-                throw new Error(`Owner retrieved from payload is not valid. Context ${context}`);
-            }
-            if (repo === '') {
-                throw new Error(`Repo retrieved from payload is not valid. Context ${context}`);
-            }
-            // Get last tag
-            const lastTag = yield getLastTag(octokit, owner, repo);
-            // Get commits between last tag and now
-            const commitsMessages = yield getCommitMessages(octokit, owner, repo, lastTag);
-            // Calculate new tag depending on commit messages
-            const newTag = calculateNewTag(commitsMessages, lastTag);
+            // const context = JSON.stringify(github.context)
+            // if (owner === '') {
+            //   throw new Error(`Owner retrieved from payload is not valid. Context ${context}`)
+            // }
+            // if (repo === '') {
+            //   throw new Error(`Repo retrieved from payload is not valid. Context ${context}`)
+            // }
+            // // Get last tag
+            // const lastTag = await getLastTag(octokit, owner, repo)
+            // // Get commits between last tag and now
+            // const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
+            // // Calculate new tag depending on commit messages
+            // const newTag = calculateNewTag(commitsMessages, lastTag)
             // Create a release
             // createRelease(octokit, owner, repo, newTag)
         }

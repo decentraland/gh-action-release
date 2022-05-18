@@ -6,7 +6,8 @@ import {paginateRest} from '@octokit/plugin-paginate-rest'
 const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$'
 
 async function run(): Promise<void> {
-  const token = core.getInput('GITHUB_TOKEN')
+  const token = core.getInput('github_token')
+  const dryRun = core.getInput('dry_run') === 'true'
 
   const PluginOctokit = Octokit.plugin(paginateRest)
   const octokit = new PluginOctokit({
@@ -17,7 +18,8 @@ async function run(): Promise<void> {
     // Get the JSON webhook payload for the event that triggered the workflow
     const owner = github.context.payload.repository?.owner.login ?? ''
     const repo = github.context.payload.repository?.name ?? ''
-    core.setOutput('context', github.context)
+    core.debug(`Context: ${JSON.stringify(github.context)}`)
+    core.info(`Dry run: ${dryRun}`)
 
     // Fail if owner or repo are not filled properly
     checkRepoAndOwner(owner, repo)
@@ -32,7 +34,7 @@ async function run(): Promise<void> {
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    createRelease(octokit, owner, repo, newTag)
+    createRelease(octokit, owner, repo, newTag, dryRun)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
@@ -61,7 +63,7 @@ async function getLastTag(
     repo
   })
   const lastTag = latestRelease.data.tag_name
-  core.setOutput('lastTag', lastTag)
+  core.info(`Last tag: ${lastTag}`)
 
   // Fail if tag is not semver
   if (!lastTag.match(SEMVER_REGEX_STRING)) {
@@ -86,8 +88,7 @@ async function getCommitMessages(octokit: Octokit, owner: string, repo: string, 
 
   // Extract messages
   const commitsMessages = commits.map(commit => commit.commit.message)
-  core.setOutput('commits', commitsMessages)
-  core.setOutput('commitsLength', commitsMessages.length)
+  core.info(`Commits length: ${commitsMessages.length}`)
 
   return commitsMessages
 }
@@ -106,13 +107,13 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
       bumpMajor = true
     }
   }
-  core.setOutput('bumpMajor', bumpMajor)
-  core.setOutput('bumpMinor', bumpMinor)
-  core.setOutput('bumpPatch', bumpPatch)
+  core.debug(`Bump major: ${bumpMajor}`)
+  core.debug(`Bump minor: ${bumpMinor}`)
+  core.debug(`Bump patch: ${bumpPatch}`)
 
   // Bump the version
   const newTag = bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch)
-  core.setOutput('newTag', newTag)
+  core.info(`New tag ${newTag}`)
   return newTag
 }
 
@@ -134,11 +135,16 @@ function bumpTag(lastTag: string, bumpMajor: boolean, bumpMinor: boolean, bumpPa
   return lastTag
 }
 
-function createRelease(octokit: Octokit, owner: string, repo: string, newTag: string): void {
-  octokit.rest.repos.createRelease({
-    owner,
-    repo,
-    tag_name: newTag,
-    generate_release_notes: true
-  })
+function createRelease(octokit: Octokit, owner: string, repo: string, newTag: string, dryRun: boolean): void {
+  if (dryRun) {
+    core.info(`Release ${newTag} was not created since it's a dry run`)
+  } else {
+    octokit.rest.repos.createRelease({
+      owner,
+      repo,
+      tag_name: newTag,
+      generate_release_notes: true
+    })
+    core.info(`Release ${newTag} created`)
+  }
 }

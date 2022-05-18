@@ -2,10 +2,14 @@ name: 'release-dcl'
 description: 'Test gh action for releasing'
 author: 'Manuel Mena'
 inputs:
-  GITHUB_TOKEN:
+  github_token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'Github token for creating the release'
+  dry_run:
+    description: If true, it doesn't create the release
+    type: boolean
+    required: false
+    default: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

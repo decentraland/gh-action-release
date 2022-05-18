@@ -34,12 +34,7 @@ async function run(): Promise<void> {
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    if (dryRun) {
-      core.info('No se releasea')
-    } else {
-      core.info('Se releasea')
-    }
-    // createRelease(octokit, owner, repo, newTag, dryRun)
+    createRelease(octokit, owner, repo, newTag, dryRun)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
@@ -141,11 +136,15 @@ function bumpTag(lastTag: string, bumpMajor: boolean, bumpMinor: boolean, bumpPa
 }
 
 function createRelease(octokit: Octokit, owner: string, repo: string, newTag: string, dryRun: boolean): void {
-  octokit.rest.repos.createRelease({
-    owner,
-    repo,
-    tag_name: newTag,
-    generate_release_notes: true
-  })
-  core.info(`Release ${newTag} created`)
+  if (dryRun) {
+    core.info(`Release ${newTag} was not created since it's a dry run`)
+  } else {
+    octokit.rest.repos.createRelease({
+      owner,
+      repo,
+      tag_name: newTag,
+      generate_release_notes: true
+    })
+    core.info(`Release ${newTag} created`)
+  }
 }

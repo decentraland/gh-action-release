@@ -18,4 +18,4 @@ jobs:
         id: result
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: false
+          dry_run: ${{ github.event.inputs.dry_run }}

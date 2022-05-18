@@ -41,7 +41,7 @@ const rest_1 = __nccwpck_require__(5375);
 const plugin_paginate_rest_1 = __nccwpck_require__(4193);
 const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$';
 function run() {
-    var _a;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         const token = core.getInput('GITHUB_TOKEN');
         const PluginOctokit = rest_1.Octokit.plugin(plugin_paginate_rest_1.paginateRest);
@@ -50,11 +50,11 @@ function run() {
         });
         try {
             // Get the JSON webhook payload for the event that triggered the workflow
-            // const owner = github.context.payload.repository?.owner.login ?? ''
+            const owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.login) !== null && _b !== void 0 ? _b : '';
             // const repo = github.context.payload.repository?.name ?? ''
             core.setOutput('context', github.context.payload);
             core.setOutput('repository', github.context.payload.repository);
-            core.setOutput('owner', (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner);
+            core.setOutput('owner', (_c = github.context.payload.repository) === null || _c === void 0 ? void 0 : _c.owner.login);
             // Fail if owner or repo are not filled properly
             // const context = JSON.stringify(github.context)
             // if (owner === '') {

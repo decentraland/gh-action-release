@@ -15,11 +15,11 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    // const owner = github.context.payload.repository?.owner.login ?? ''
+    const owner = github.context.payload.repository?.owner.login ?? ''
     // const repo = github.context.payload.repository?.name ?? ''
     core.setOutput('context', github.context.payload)
     core.setOutput('repository', github.context.payload.repository)
-    core.setOutput('owner', github.context.payload.repository?.owner)
+    core.setOutput('owner', github.context.payload.repository?.owner.login)
 
     // Fail if owner or repo are not filled properly
     // const context = JSON.stringify(github.context)

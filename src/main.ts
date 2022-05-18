@@ -15,7 +15,7 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    const owner = github.context.payload.repository?.owner.login ?? ''
+    const owner = github.context.payload.repository?.owner?.login ?? ''
     const repo = github.context.payload.repository?.name ?? ''
     core.setOutput('context', github.context)
 
@@ -38,7 +38,7 @@ async function run(): Promise<void> {
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    createRelease(octokit, owner, repo, newTag)
+    // createRelease(octokit, owner, repo, newTag)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

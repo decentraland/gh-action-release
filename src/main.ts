@@ -18,7 +18,7 @@ async function run(): Promise<void> {
     // Get the JSON webhook payload for the event that triggered the workflow
     const owner = github.context.payload.repository?.owner.login ?? ''
     const repo = github.context.payload.repository?.name ?? ''
-    core.info(`Context: ${JSON.stringify(github.context)}`)
+    core.debug(`Context: ${JSON.stringify(github.context)}`)
     core.info(`Dry run: ${dryRun}`)
 
     // Fail if owner or repo are not filled properly

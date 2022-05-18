@@ -20,13 +20,7 @@ async function run(): Promise<void> {
     core.setOutput('context', github.context)
 
     // Fail if owner or repo are not filled properly
-    const context = JSON.stringify(github.context)
-    if (owner === '') {
-      throw new Error(`Owner retrieved from payload is not valid. Context ${context}`)
-    }
-    if (repo === '') {
-      throw new Error(`Repo retrieved from payload is not valid. Context ${context}`)
-    }
+    checkRepoAndOwner(owner, repo)
 
     // Get last tag
     const lastTag = await getLastTag(octokit, owner, repo)
@@ -45,6 +39,16 @@ async function run(): Promise<void> {
 }
 
 run()
+
+function checkRepoAndOwner(owner: string, repo: string): void {
+  const context = JSON.stringify(github.context)
+  if (owner === '') {
+    throw new Error(`Owner retrieved from payload is not valid. Context ${context}`)
+  }
+  if (repo === '') {
+    throw new Error(`Repo retrieved from payload is not valid. Context ${context}`)
+  }
+}
 
 async function getLastTag(
   octokit: Octokit,

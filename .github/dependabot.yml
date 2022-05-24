@@ -4,8 +4,11 @@ updates:
     directory: /
     schedule:
       interval: daily
+    versioning-strategy: auto
 
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: daily
+    versioning-strategy: auto
+

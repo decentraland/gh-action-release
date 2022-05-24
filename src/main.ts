@@ -88,6 +88,7 @@ async function getCommitMessages(octokit: Octokit, owner: string, repo: string, 
 
   // Extract messages
   const commitsMessages = commits.map(commit => commit.commit.message)
+  core.info(`Commits: ${commitsMessages}`)
   core.info(`Commits length: ${commitsMessages.length}`)
 
   return commitsMessages
@@ -98,6 +99,7 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   let bumpPatch = false
   let bumpMinor = false
   let bumpMajor = false
+  const nonStandarizedCommits = []
   for (const message of commitsMessages) {
     if (message.match('^(chore|docs|fix|refactor|revert|style|test): .+$')) {
       bumpPatch = true
@@ -105,11 +107,14 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
       bumpMinor = true
     } else if (message.match('^break: .+$')) {
       bumpMajor = true
+    } else {
+      nonStandarizedCommits.push(message)
     }
   }
-  core.debug(`Bump major: ${bumpMajor}`)
-  core.debug(`Bump minor: ${bumpMinor}`)
-  core.debug(`Bump patch: ${bumpPatch}`)
+  core.info(`Commits that doesn't respect the convention: ${nonStandarizedCommits}`)
+  core.info(`Bump major: ${bumpMajor}`)
+  core.info(`Bump minor: ${bumpMinor}`)
+  core.info(`Bump patch: ${bumpPatch}`)
 
   // Bump the version
   const newTag = bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch)

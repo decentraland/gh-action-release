@@ -3,7 +3,8 @@ import * as github from '@actions/github'
 import {Octokit} from '@octokit/rest'
 import {paginateRest} from '@octokit/plugin-paginate-rest'
 
-const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$'
+const semverRegexString = '^([0-9]+).([0-9]+).([0-9]+)$'
+const parenthesisRegex = '(\([^\(|\)]+\))?'
 
 async function run(): Promise<void> {
   const token = core.getInput('github_token')
@@ -66,7 +67,7 @@ async function getLastTag(
   core.info(`Last tag: ${lastTag}`)
 
   // Fail if tag is not semver
-  if (!lastTag.match(SEMVER_REGEX_STRING)) {
+  if (!lastTag.match(semverRegexString)) {
     throw new Error(`Latest release tag name is not semver. Found: ${lastTag}`)
   }
   return lastTag
@@ -101,11 +102,11 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   let bumpMajor = false
   const nonStandarizedCommits = []
   for (const message of commitsMessages) {
-    if (message.match('^(chore|docs|fix|refactor|revert|style|test): .+$')) {
+    if (message.match(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`)) {
       bumpPatch = true
-    } else if (message.match('^feat: .+$')) {
+    } else if (message.match(`^feat${parenthesisRegex}: .+$`)) {
       bumpMinor = true
-    } else if (message.match('^break: .+$')) {
+    } else if (message.match(`^break${parenthesisRegex}: .+$`)) {
       bumpMajor = true
     } else {
       nonStandarizedCommits.push(message)
@@ -123,7 +124,7 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
 }
 
 function bumpTag(lastTag: string, bumpMajor: boolean, bumpMinor: boolean, bumpPatch: boolean): string {
-  const semverRegex = new RegExp(SEMVER_REGEX_STRING, 'g')
+  const semverRegex = new RegExp(semverRegexString, 'g')
   const match = semverRegex.exec(lastTag)
   if (match) {
     if (bumpMajor) {

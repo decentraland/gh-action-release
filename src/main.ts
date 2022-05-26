@@ -27,17 +27,15 @@ async function run(): Promise<void> {
 
     // Get last tag
     const lastTag = await getLastTag(octokit, owner, repo)
-    // const lastTag = '0.2.0'
 
     // Get commits between last tag and now
     const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
-    // const commitsMessages = ['chore(asdf): lkjh']
 
     // Calculate new tag depending on commit messages
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    // createRelease(octokit, owner, repo, newTag, dryRun)
+    createRelease(octokit, owner, repo, newTag, dryRun)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

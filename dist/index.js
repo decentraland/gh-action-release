@@ -42,6 +42,7 @@ const plugin_paginate_rest_1 = __nccwpck_require__(4193);
 const semverRegexString = '^([0-9]+).([0-9]+).([0-9]+)$';
 const parenthesisRegex = '(\(.+\))?';
 function run() {
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         const token = core.getInput('github_token');
         const dryRun = core.getInput('dry_run') === 'true';
@@ -51,18 +52,18 @@ function run() {
         });
         try {
             // Get the JSON webhook payload for the event that triggered the workflow
-            // const owner = github.context.payload.repository?.owner.login ?? ''
-            // const repo = github.context.payload.repository?.name ?? ''
-            // core.debug(`Context: ${JSON.stringify(github.context)}`)
-            // core.info(`Dry run: ${dryRun}`)
+            const owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.login) !== null && _b !== void 0 ? _b : '';
+            const repo = (_d = (_c = github.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) !== null && _d !== void 0 ? _d : '';
+            core.debug(`Context: ${JSON.stringify(github.context)}`);
+            core.info(`Dry run: ${dryRun}`);
             // Fail if owner or repo are not filled properly
-            // checkRepoAndOwner(owner, repo)
+            checkRepoAndOwner(owner, repo);
             // Get last tag
-            // const lastTag = await getLastTag(octokit, owner, repo)
-            const lastTag = '0.2.0';
+            const lastTag = yield getLastTag(octokit, owner, repo);
+            // const lastTag = '0.2.0'
             // Get commits between last tag and now
-            // const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
-            const commitsMessages = ['chore(asdf): lkjh'];
+            const commitsMessages = yield getCommitMessages(octokit, owner, repo, lastTag);
+            // const commitsMessages = ['chore(asdf): lkjh']
             // Calculate new tag depending on commit messages
             const newTag = calculateNewTag(commitsMessages, lastTag);
             // Create a release

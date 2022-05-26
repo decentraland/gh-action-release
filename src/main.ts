@@ -17,21 +17,21 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    // const owner = github.context.payload.repository?.owner.login ?? ''
-    // const repo = github.context.payload.repository?.name ?? ''
-    // core.debug(`Context: ${JSON.stringify(github.context)}`)
-    // core.info(`Dry run: ${dryRun}`)
+    const owner = github.context.payload.repository?.owner.login ?? ''
+    const repo = github.context.payload.repository?.name ?? ''
+    core.debug(`Context: ${JSON.stringify(github.context)}`)
+    core.info(`Dry run: ${dryRun}`)
 
     // Fail if owner or repo are not filled properly
-    // checkRepoAndOwner(owner, repo)
+    checkRepoAndOwner(owner, repo)
 
     // Get last tag
-    // const lastTag = await getLastTag(octokit, owner, repo)
-    const lastTag = '0.2.0'
+    const lastTag = await getLastTag(octokit, owner, repo)
+    // const lastTag = '0.2.0'
 
     // Get commits between last tag and now
-    // const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
-    const commitsMessages = ['chore(asdf): lkjh']
+    const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
+    // const commitsMessages = ['chore(asdf): lkjh']
 
     // Calculate new tag depending on commit messages
     const newTag = calculateNewTag(commitsMessages, lastTag)

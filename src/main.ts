@@ -4,7 +4,7 @@ import {Octokit} from '@octokit/rest'
 import {paginateRest} from '@octokit/plugin-paginate-rest'
 
 const semverRegexString = '^([0-9]+).([0-9]+).([0-9]+)$'
-const parenthesisRegex = '(\([^\(|\)]+\))?'
+const parenthesisRegex = '(\(.+\))?'
 
 async function run(): Promise<void> {
   const token = core.getInput('github_token')
@@ -17,25 +17,27 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    const owner = github.context.payload.repository?.owner.login ?? ''
-    const repo = github.context.payload.repository?.name ?? ''
-    core.debug(`Context: ${JSON.stringify(github.context)}`)
-    core.info(`Dry run: ${dryRun}`)
+    // const owner = github.context.payload.repository?.owner.login ?? ''
+    // const repo = github.context.payload.repository?.name ?? ''
+    // core.debug(`Context: ${JSON.stringify(github.context)}`)
+    // core.info(`Dry run: ${dryRun}`)
 
     // Fail if owner or repo are not filled properly
-    checkRepoAndOwner(owner, repo)
+    // checkRepoAndOwner(owner, repo)
 
     // Get last tag
-    const lastTag = await getLastTag(octokit, owner, repo)
+    // const lastTag = await getLastTag(octokit, owner, repo)
+    const lastTag = '0.2.0'
 
     // Get commits between last tag and now
-    const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
+    // const commitsMessages = await getCommitMessages(octokit, owner, repo, lastTag)
+    const commitsMessages = ['chore(asdf): lkjh']
 
     // Calculate new tag depending on commit messages
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    createRelease(octokit, owner, repo, newTag, dryRun)
+    // createRelease(octokit, owner, repo, newTag, dryRun)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
@@ -102,6 +104,12 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   let bumpMajor = false
   const nonStandarizedCommits = []
   for (const message of commitsMessages) {
+    let regex = new RegExp('^(chore|docs|fix|refactor|revert|style|test)(\(.*\))?: .+$', 'g')
+    let match = regex.exec(message)
+    core.info((match ?? 'no hay match').toString())
+    regex = new RegExp('^(chore|docs|fix|refactor|revert|style|test)(\(.*\))?: .+$', 'gm')
+    match = regex.exec(message)
+    core.info((match ?? 'no hay match').toString())
     if (message.match(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`)) {
       bumpPatch = true
     } else if (message.match(`^feat${parenthesisRegex}: .+$`)) {

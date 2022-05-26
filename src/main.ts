@@ -117,7 +117,7 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
       nonStandarizedCommits.push(message)
     }
   }
-  core.info(`Commits that doesn't respect the convention: [${nonStandarizedCommits}]`)
+  core.info(`${nonStandarizedCommits.length} commits doesn't respect the convention: [${nonStandarizedCommits}]`)
   core.info(`Bump major: ${bumpMajor}`)
   core.info(`Bump minor: ${bumpMinor}`)
   core.info(`Bump patch: ${bumpPatch}`)

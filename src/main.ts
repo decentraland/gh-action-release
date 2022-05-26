@@ -89,8 +89,7 @@ async function getCommitMessages(octokit: Octokit, owner: string, repo: string, 
 
   // Extract messages
   const commitsMessages = commits.map(commit => commit.commit.message)
-  core.info(`Commits: [${commitsMessages}]`)
-  core.info(`Commits length: ${commitsMessages.length}`)
+  core.info(`${commitsMessages.length} commits found: [${commitsMessages}]`)
 
   return commitsMessages
 }

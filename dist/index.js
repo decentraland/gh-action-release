@@ -60,14 +60,12 @@ function run() {
             checkRepoAndOwner(owner, repo);
             // Get last tag
             const lastTag = yield getLastTag(octokit, owner, repo);
-            // const lastTag = '0.2.0'
             // Get commits between last tag and now
             const commitsMessages = yield getCommitMessages(octokit, owner, repo, lastTag);
-            // const commitsMessages = ['chore(asdf): lkjh']
             // Calculate new tag depending on commit messages
             const newTag = calculateNewTag(commitsMessages, lastTag);
             // Create a release
-            // createRelease(octokit, owner, repo, newTag, dryRun)
+            createRelease(octokit, owner, repo, newTag, dryRun);
         }
         catch (error) {
             if (error instanceof Error)
@@ -113,8 +111,7 @@ function getCommitMessages(octokit, owner, repo, lastTag) {
         }, response => response.data.commits);
         // Extract messages
         const commitsMessages = commits.map(commit => commit.commit.message);
-        core.info(`Commits: [${commitsMessages}]`);
-        core.info(`Commits length: ${commitsMessages.length}`);
+        core.info(`${commitsMessages.length} commits found: [${commitsMessages}]`);
         return commitsMessages;
     });
 }

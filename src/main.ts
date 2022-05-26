@@ -3,7 +3,8 @@ import * as github from '@actions/github'
 import {Octokit} from '@octokit/rest'
 import {paginateRest} from '@octokit/plugin-paginate-rest'
 
-const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$'
+const semverRegexString = '^([0-9]+).([0-9]+).([0-9]+)$'
+const parenthesisRegex = '(\(.+\))?'
 
 async function run(): Promise<void> {
   const token = core.getInput('github_token')
@@ -66,7 +67,7 @@ async function getLastTag(
   core.info(`Last tag: ${lastTag}`)
 
   // Fail if tag is not semver
-  if (!lastTag.match(SEMVER_REGEX_STRING)) {
+  if (!lastTag.match(semverRegexString)) {
     throw new Error(`Latest release tag name is not semver. Found: ${lastTag}`)
   }
   return lastTag
@@ -88,8 +89,7 @@ async function getCommitMessages(octokit: Octokit, owner: string, repo: string, 
 
   // Extract messages
   const commitsMessages = commits.map(commit => commit.commit.message)
-  core.info(`Commits: ${commitsMessages}`)
-  core.info(`Commits length: ${commitsMessages.length}`)
+  core.info(`${commitsMessages.length} commits found: [${commitsMessages}]`)
 
   return commitsMessages
 }
@@ -101,17 +101,20 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   let bumpMajor = false
   const nonStandarizedCommits = []
   for (const message of commitsMessages) {
-    if (message.match('^(chore|docs|fix|refactor|revert|style|test): .+$')) {
+    const patchRegex = new RegExp(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`, 'gm')
+    const minorRegex = new RegExp(`^feat${parenthesisRegex}: .+$`, 'gm')
+    const majorRegex = new RegExp(`^break${parenthesisRegex}: .+$`, 'gm')
+    if (patchRegex.exec(message)) {
       bumpPatch = true
-    } else if (message.match('^feat: .+$')) {
+    } else if (minorRegex.exec(message)) {
       bumpMinor = true
-    } else if (message.match('^break: .+$')) {
+    } else if (majorRegex.exec(message)) {
       bumpMajor = true
     } else {
       nonStandarizedCommits.push(message)
     }
   }
-  core.info(`Commits that doesn't respect the convention: ${nonStandarizedCommits}`)
+  core.info(`${nonStandarizedCommits.length} commits doesn't respect the convention: [${nonStandarizedCommits}]`)
   core.info(`Bump major: ${bumpMajor}`)
   core.info(`Bump minor: ${bumpMinor}`)
   core.info(`Bump patch: ${bumpPatch}`)
@@ -123,7 +126,7 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
 }
 
 function bumpTag(lastTag: string, bumpMajor: boolean, bumpMinor: boolean, bumpPatch: boolean): string {
-  const semverRegex = new RegExp(SEMVER_REGEX_STRING, 'g')
+  const semverRegex = new RegExp(semverRegexString, 'g')
   const match = semverRegex.exec(lastTag)
   if (match) {
     if (bumpMajor) {

@@ -39,7 +39,8 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const rest_1 = __nccwpck_require__(5375);
 const plugin_paginate_rest_1 = __nccwpck_require__(4193);
-const SEMVER_REGEX_STRING = '^([0-9]+).([0-9]+).([0-9]+)$';
+const semverRegexString = '^([0-9]+).([0-9]+).([0-9]+)$';
+const parenthesisRegex = '(\(.+\))?';
 function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
@@ -92,7 +93,7 @@ function getLastTag(octokit, owner, repo) {
         const lastTag = latestRelease.data.tag_name;
         core.info(`Last tag: ${lastTag}`);
         // Fail if tag is not semver
-        if (!lastTag.match(SEMVER_REGEX_STRING)) {
+        if (!lastTag.match(semverRegexString)) {
             throw new Error(`Latest release tag name is not semver. Found: ${lastTag}`);
         }
         return lastTag;
@@ -110,8 +111,7 @@ function getCommitMessages(octokit, owner, repo, lastTag) {
         }, response => response.data.commits);
         // Extract messages
         const commitsMessages = commits.map(commit => commit.commit.message);
-        core.info(`Commits: ${commitsMessages}`);
-        core.info(`Commits length: ${commitsMessages.length}`);
+        core.info(`${commitsMessages.length} commits found: [${commitsMessages}]`);
         return commitsMessages;
     });
 }
@@ -122,20 +122,23 @@ function calculateNewTag(commitsMessages, lastTag) {
     let bumpMajor = false;
     const nonStandarizedCommits = [];
     for (const message of commitsMessages) {
-        if (message.match('^(chore|docs|fix|refactor|revert|style|test): .+$')) {
+        const patchRegex = new RegExp(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`, 'gm');
+        const minorRegex = new RegExp(`^feat${parenthesisRegex}: .+$`, 'gm');
+        const majorRegex = new RegExp(`^break${parenthesisRegex}: .+$`, 'gm');
+        if (patchRegex.exec(message)) {
             bumpPatch = true;
         }
-        else if (message.match('^feat: .+$')) {
+        else if (minorRegex.exec(message)) {
             bumpMinor = true;
         }
-        else if (message.match('^break: .+$')) {
+        else if (majorRegex.exec(message)) {
             bumpMajor = true;
         }
         else {
             nonStandarizedCommits.push(message);
         }
     }
-    core.info(`Commits that doesn't respect the convention: ${nonStandarizedCommits}`);
+    core.info(`${nonStandarizedCommits.length} commits doesn't respect the convention: [${nonStandarizedCommits}]`);
     core.info(`Bump major: ${bumpMajor}`);
     core.info(`Bump minor: ${bumpMinor}`);
     core.info(`Bump patch: ${bumpPatch}`);
@@ -145,7 +148,7 @@ function calculateNewTag(commitsMessages, lastTag) {
     return newTag;
 }
 function bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch) {
-    const semverRegex = new RegExp(SEMVER_REGEX_STRING, 'g');
+    const semverRegex = new RegExp(semverRegexString, 'g');
     const match = semverRegex.exec(lastTag);
     if (match) {
         if (bumpMajor) {

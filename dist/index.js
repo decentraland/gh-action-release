@@ -113,7 +113,7 @@ function getCommitMessages(octokit, owner, repo, lastTag) {
         }, response => response.data.commits);
         // Extract messages
         const commitsMessages = commits.map(commit => commit.commit.message);
-        core.info(`Commits: ${commitsMessages}`);
+        core.info(`Commits: [${commitsMessages}]`);
         core.info(`Commits length: ${commitsMessages.length}`);
         return commitsMessages;
     });
@@ -141,7 +141,7 @@ function calculateNewTag(commitsMessages, lastTag) {
             nonStandarizedCommits.push(message);
         }
     }
-    core.info(`Commits that doesn't respect the convention: ${nonStandarizedCommits}`);
+    core.info(`Commits that doesn't respect the convention: [${nonStandarizedCommits}]`);
     core.info(`Bump major: ${bumpMajor}`);
     core.info(`Bump minor: ${bumpMinor}`);
     core.info(`Bump patch: ${bumpPatch}`);

@@ -104,17 +104,14 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   let bumpMajor = false
   const nonStandarizedCommits = []
   for (const message of commitsMessages) {
-    let regex = new RegExp('^(chore|docs|fix|refactor|revert|style|test)(\(.*\))?: .+$', 'g')
-    let match = regex.exec(message)
-    core.info((match ?? 'no hay match').toString())
-    regex = new RegExp('^(chore|docs|fix|refactor|revert|style|test)(\(.*\))?: .+$', 'gm')
-    match = regex.exec(message)
-    core.info((match ?? 'no hay match').toString())
-    if (message.match(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`)) {
+    const patchRegex = new RegExp(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`, 'gm')
+    const minorRegex = new RegExp(`^feat${parenthesisRegex}: .+$`, 'gm')
+    const majorRegex = new RegExp(`^break${parenthesisRegex}: .+$`, 'gm')
+    if (patchRegex.exec(message)) {
       bumpPatch = true
-    } else if (message.match(`^feat${parenthesisRegex}: .+$`)) {
+    } else if (minorRegex.exec(message)) {
       bumpMinor = true
-    } else if (message.match(`^break${parenthesisRegex}: .+$`)) {
+    } else if (majorRegex.exec(message)) {
       bumpMajor = true
     } else {
       nonStandarizedCommits.push(message)

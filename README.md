@@ -1,22 +1,60 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# What is it
 
-# Create a JavaScript Action using TypeScript
+gh-action-release is a Github action that does the following:
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+1. Get the tag of the latest release
+2. Read the commits from that tag up to `head`
+3. Calculate a new tag version depending on the commit messages
+4. Create a new release with that tag version, push the new tag, and generate the release notes
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
+> [Github API](https://docs.github.com/en/rest/releases/releases#create-a-release) only looks for the merged prs when generating the release notes. The changes will be inside your release, though, they will just not appear listed in the release's description.
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+# Integration
 
-## Create an action from this template
+Include it in a Github workflow like the following:
 
-Click the `Use this Template` and provide the new repo details for your action
+```yaml
+name: 'release'
+on:
+  workflow_dispatch:
+    inputs:
+        dry_run:
+          description: dry run
+          type: boolean
+          required: false
+          default: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: decentraland/gh-action-release@0.2.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: ${{ github.event.inputs.dry_run }}
+```
 
-## Code in Main
+> Note that this action receives 2 parameters:
+> - `github_token`: neccessary for collecting the repository's data
+> - `dry_run`: makes the action to avoid releasing > when set to true, it only prints
 
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
+The workflow that calls it also needs `permissions: write-all` to being able to create the release, as it is in the example.
+
+## How to run
+
+Once integrated in any branch, go to your repository page in Github. Click on the [actions tab](https://github.com/decentraland/gh-action-release/actions), you will see the name of your workflow there and a button that reads `Run workflow` if it is triggered on `workflow_dispatch` like the one in the example above.
+
+> :warning: **THERE MUST BE A FIRST RELEASE TO WORK**, so for now you will need to make your first release manually
+
+### Naming convention
+
+Following the [Git style guide](https://github.com/decentraland/adr/blob/main/docs/ADR-6-git-style-guide.md) enables us to bump the version automatically. Any commit pushed to `main` that doesn't respect the convention will be ignored when determining the new version number.
+
+# Contributing
+
+## How to build
+
+> You'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
 
 Install the dependencies  
 ```bash
@@ -28,78 +66,26 @@ Build the typescript and package it for distribution
 $ npm run build && npm run package
 ```
 
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
+## Changing the Code
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
+The core funcionallity is in [src/main.ts](https://github.com/decentraland/gh-action-release/blob/main/src/main.ts)
 
 Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
 
-```javascript
-import * as core from '@actions/core';
-...
+The [action.yml](https://github.com/decentraland/gh-action-release/blob/main/action.yml) defines the inputs and output for your action.
 
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
+## Creating a pull request
 
-run()
-```
+We follow the [Git style guide](https://github.com/decentraland/adr/blob/main/docs/ADR-6-git-style-guide.md) for git usage
 
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
+1. In case the PR is done using a branch within the service, it should have the semantic prefix.
+2. Before merging into `main` make sure the squash commit has the correct semantic type prefix.
 
-## Publish to a distribution branch
+Adopting this convention helps us keep the commit history tidy and easier to understand, but also makes it easier to write automated tools like this one on top.
 
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
+Check the [Automatic version bumping]([AUTOMATIC_VERSION_BUMPING.md](https://github.com/decentraland/catalyst/blob/main/docs/AUTOMATIC_VERSION_BUMPING.md)) guide to know how your pull request's title should be.
 
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
 
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
+# Releasing
 
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
-
-```yaml
-uses: ./
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
-
-## Usage:
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+This action uses itself to do its own releases! Start a release by running the [release workflow](https://github.com/decentraland/gh-action-release/actions/workflows/release.yml).

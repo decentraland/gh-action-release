@@ -4,7 +4,7 @@ gh-action-release is a Github action that does the following:
 
 1. Get the tag of the latest release
 2. Read the commits from that tag up to `head`
-3. Calculate a new tag version depending on the commit messages
+3. Calculate a new tag version depending on the commit messages (which must follow our [Git style guide](https://github.com/decentraland/adr/blob/main/docs/ADR-6-git-style-guide.md))
 4. Create a new release with that tag version, push the new tag, and generate the release notes
 
 > [Github API](https://docs.github.com/en/rest/releases/releases#create-a-release) only looks for the merged prs when generating the release notes. The changes will be inside your release, though, they will just not appear listed in the release's description.
@@ -34,9 +34,9 @@ jobs:
           dry_run: ${{ github.event.inputs.dry_run }}
 ```
 
-> Note that this action receives 2 parameters:
-> - `github_token`: neccessary for collecting the repository's data
-> - `dry_run`: makes the action to avoid releasing > when set to true, it only prints
+Note that this action receives 2 parameters:
+- `github_token`: neccessary for collecting the repository's data
+- `dry_run`: makes the action to avoid releasing > when set to true, it only prints
 
 The workflow that calls it also needs `permissions: write-all` to being able to create the release, as it is in the example.
 

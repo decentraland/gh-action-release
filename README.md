@@ -50,6 +50,8 @@ Once integrated in any branch, go to your repository page in Github. Click on th
 
 Following the [Git style guide](https://github.com/decentraland/adr/blob/main/docs/ADR-6-git-style-guide.md) enables us to bump the version automatically. Any commit pushed to `main` that doesn't respect the convention will be ignored when determining the new version number.
 
+We have developed a workflow which **enforces a pr's title to follow the naming convention** to use it along with this action. Please refer to our [actions repo](https://github.com/decentraland/actions).
+
 # Contributing
 
 ## How to build

@@ -9,6 +9,9 @@ const parenthesisRegex = '(\(.+\))?'
 async function run(): Promise<void> {
   const token = core.getInput('github_token')
   const dryRun = core.getInput('dry_run') === 'true'
+  const repository = core.getInput('repository')
+  core.info(`repo received is ${repository}`)
+  core.info(`github ${github}`)
 
   const PluginOctokit = Octokit.plugin(paginateRest)
   const octokit = new PluginOctokit({

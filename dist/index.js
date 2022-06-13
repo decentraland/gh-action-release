@@ -47,18 +47,22 @@ function run() {
         const token = core.getInput('github_token');
         const dryRun = core.getInput('dry_run') === 'true';
         const repository = core.getInput('repository');
-        core.info(`repo received is ${repository}`);
-        core.info(`github ${github}`);
         const PluginOctokit = rest_1.Octokit.plugin(plugin_paginate_rest_1.paginateRest);
         const octokit = new PluginOctokit({
             auth: token
         });
         try {
             // Get the JSON webhook payload for the event that triggered the workflow
-            const owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.login) !== null && _b !== void 0 ? _b : '';
-            const repo = (_d = (_c = github.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) !== null && _d !== void 0 ? _d : '';
+            let owner = (_b = (_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.owner.login) !== null && _b !== void 0 ? _b : '';
+            let repo = (_d = (_c = github.context.payload.repository) === null || _c === void 0 ? void 0 : _c.name) !== null && _d !== void 0 ? _d : '';
             core.debug(`Context: ${JSON.stringify(github.context)}`);
             core.info(`Dry run: ${dryRun}`);
+            // Set owner and repo if repository input is found
+            if (repository !== '') {
+                core.info(`Repository (Optional input): ${repository}`);
+                owner = repository.split('/')[0];
+                repo = repository.split('/')[1];
+            }
             // Fail if owner or repo are not filled properly
             checkRepoAndOwner(owner, repo);
             // Get last tag

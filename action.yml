@@ -3,13 +3,17 @@ description: 'Test gh action for releasing'
 author: 'Manuel Mena'
 inputs:
   github_token:
-    required: true
     description: 'Github token for creating the release'
+    required: true
   dry_run:
     description: If true, it doesn't create the release
     type: boolean
     required: false
     default: false
+  repository:
+    description: 'Full repository format: org/repo'
+    required: false
+
 runs:
   using: 'node16'
   main: 'dist/index.js'

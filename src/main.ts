@@ -9,6 +9,7 @@ const parenthesisRegex = '(\(.+\))?'
 async function run(): Promise<void> {
   const token = core.getInput('github_token')
   const dryRun = core.getInput('dry_run') === 'true'
+  const repository = core.getInput('repository')
 
   const PluginOctokit = Octokit.plugin(paginateRest)
   const octokit = new PluginOctokit({
@@ -17,10 +18,19 @@ async function run(): Promise<void> {
 
   try {
     // Get the JSON webhook payload for the event that triggered the workflow
-    const owner = github.context.payload.repository?.owner.login ?? ''
-    const repo = github.context.payload.repository?.name ?? ''
+    let owner = github.context.payload.repository?.owner.login ?? ''
+    let repo = github.context.payload.repository?.name ?? ''
     core.debug(`Context: ${JSON.stringify(github.context)}`)
     core.info(`Dry run: ${dryRun}`)
+
+    // Override owner and repo if repository input is found
+    if (repository !== '') {
+      core.warning(`Repository is being overriden to: ${repository}. Use this only for scheduled workflows`)
+      owner = repository.split('/')[0]
+      repo = repository.split('/')[1]
+      core.warning(`New owner: ${owner}`)
+      core.warning(`New repo: ${repo}`)
+    }
 
     // Fail if owner or repo are not filled properly
     checkRepoAndOwner(owner, repo)

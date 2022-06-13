@@ -28,8 +28,8 @@ async function run(): Promise<void> {
       core.warning(`Repository is being overriden to: ${repository}. Use this only for scheduled workflows`)
       owner = repository.split('/')[0]
       repo = repository.split('/')[1]
-      core.info(`New owner: ${owner}`)
-      core.info(`New repo: ${repo}`)
+      core.warning(`New owner: ${owner}`)
+      core.warning(`New repo: ${repo}`)
     }
 
     // Fail if owner or repo are not filled properly

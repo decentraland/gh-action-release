@@ -6,7 +6,7 @@ inputs:
     description: 'Github token for creating the release'
     required: true
   dry_run:
-    description: 'If true, it doesn't create the release'
+    description: If true, it doesn't create the release
     type: boolean
     required: false
     default: false

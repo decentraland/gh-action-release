@@ -25,9 +25,11 @@ async function run(): Promise<void> {
 
     // Override owner and repo if repository input is found
     if (repository !== '') {
-      core.warning(`Repository is being overriden to: ${repository}. Use this only for shceduled workflows`)
+      core.warning(`Repository is being overriden to: ${repository}. Use this only for scheduled workflows`)
       owner = repository.split('/')[0]
       repo = repository.split('/')[1]
+      core.info(`New owner: ${owner}`)
+      core.info(`New repo: ${repo}`)
     }
 
     // Fail if owner or repo are not filled properly

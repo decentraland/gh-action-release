@@ -3,12 +3,18 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "America/Buenos_Aires"
     versioning-strategy: auto
 
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "America/Buenos_Aires"
     versioning-strategy: auto
 

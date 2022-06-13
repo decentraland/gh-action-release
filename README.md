@@ -28,15 +28,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - uses: decentraland/gh-action-release@0.2.2
+      - uses: decentraland/gh-action-release@0.3.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: ${{ github.event.inputs.dry_run }}
 ```
 
-Note that this action receives 2 parameters:
-- `github_token`: neccessary for collecting the repository's data
-- `dry_run`: makes the action to avoid releasing > when set to true, it only prints
+Note that this action receives 1 mandatory and 2 optional parameters:
+- `github_token` (mandatory): neccessary for collecting the repository's data
+- `dry_run` (optional): makes the action to avoid releasing. When set to true, it only prints. Default is set to false.
+- `repository` (optional): needed when the workflow is being triggered by a cron schedule. Not neccessary and not recommended when triggered manually. Use as follows:
+  ```yaml
+  - uses: decentraland/gh-action-release@0.3.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+  ```
 
 The workflow that calls it also needs `permissions: write-all` to being able to create the release, as it is in the example.
 

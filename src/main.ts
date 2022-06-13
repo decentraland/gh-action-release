@@ -11,7 +11,7 @@ async function run(): Promise<void> {
   const dryRun = core.getInput('dry_run') === 'true'
   const repository = core.getInput('repository')
   core.info(`repo received is ${repository}`)
-  core.info(`github ${github}`)
+  core.info(`github ${github.repository}`)
 
   const PluginOctokit = Octokit.plugin(paginateRest)
   const octokit = new PluginOctokit({

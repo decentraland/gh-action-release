@@ -45,7 +45,11 @@ async function run(): Promise<void> {
     const newTag = calculateNewTag(commitsMessages, lastTag)
 
     // Create a release
-    createRelease(octokit, owner, repo, newTag, dryRun)
+    if (lastTag === newTag) {
+      core.warning(`Since version wasn't bumped, release won't be created`)
+    } else {
+      createRelease(octokit, owner, repo, newTag, dryRun)
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
@@ -99,7 +103,7 @@ async function getCommitMessages(octokit: Octokit, owner: string, repo: string, 
 
   // Extract messages
   const commitsMessages = commits.map(commit => commit.commit.message)
-  core.info(`${commitsMessages.length} commits found: [${commitsMessages}]`)
+  core.debug(`${commitsMessages.length} commits found: [${commitsMessages}]`)
 
   return commitsMessages
 }
@@ -109,6 +113,7 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   let bumpPatch = false
   let bumpMinor = false
   let bumpMajor = false
+  const standarizedCommits = []
   const nonStandarizedCommits = []
   for (const message of commitsMessages) {
     const patchRegex = new RegExp(`^(chore|docs|fix|refactor|revert|style|test)${parenthesisRegex}: .+$`, 'gm')
@@ -116,18 +121,22 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
     const majorRegex = new RegExp(`^break${parenthesisRegex}: .+$`, 'gm')
     if (patchRegex.exec(message)) {
       bumpPatch = true
+      standarizedCommits.push(message)
     } else if (minorRegex.exec(message)) {
       bumpMinor = true
+      standarizedCommits.push(message)
     } else if (majorRegex.exec(message)) {
       bumpMajor = true
+      standarizedCommits.push(message)
     } else {
       nonStandarizedCommits.push(message)
     }
   }
+  core.info(`${standarizedCommits.length} commits respect the convention: [${standarizedCommits}]`)
   core.info(`${nonStandarizedCommits.length} commits doesn't respect the convention: [${nonStandarizedCommits}]`)
-  core.info(`Bump major: ${bumpMajor}`)
-  core.info(`Bump minor: ${bumpMinor}`)
-  core.info(`Bump patch: ${bumpPatch}`)
+  core.debug(`Bump major: ${bumpMajor}`)
+  core.debug(`Bump minor: ${bumpMinor}`)
+  core.debug(`Bump patch: ${bumpPatch}`)
 
   // Bump the version
   const newTag = bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch)
@@ -148,6 +157,8 @@ function bumpTag(lastTag: string, bumpMajor: boolean, bumpMinor: boolean, bumpPa
     } else if (bumpPatch) {
       const bump = (parseInt(match[3]) + 1).toString()
       return lastTag.replace(semverRegex, `$1.$2.${bump}`)
+    } else {
+      core.info(`Version ${lastTag} was not bumped`)
     }
   }
   return lastTag

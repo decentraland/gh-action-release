@@ -134,9 +134,9 @@ function calculateNewTag(commitsMessages: string[], lastTag: string): string {
   }
   core.info(`${standarizedCommits.length} commits respect the convention: [${standarizedCommits}]`)
   core.info(`${nonStandarizedCommits.length} commits doesn't respect the convention: [${nonStandarizedCommits}]`)
-  core.info(`Bump major: ${bumpMajor}`)
-  core.info(`Bump minor: ${bumpMinor}`)
-  core.info(`Bump patch: ${bumpPatch}`)
+  core.debug(`Bump major: ${bumpMajor}`)
+  core.debug(`Bump minor: ${bumpMinor}`)
+  core.debug(`Bump patch: ${bumpPatch}`)
 
   // Bump the version
   const newTag = bumpTag(lastTag, bumpMajor, bumpMinor, bumpPatch)

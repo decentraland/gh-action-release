@@ -35,7 +35,7 @@ jobs:
 ```
 
 Note that this action receives 1 mandatory and 2 optional parameters:
-- `github_token` (mandatory): neccessary for collecting the repository's data
+- `github_token` (mandatory): neccessary for collecting the repository's data.
 - `dry_run` (optional): makes the action to avoid releasing. When set to true, it only prints. Default is set to false.
 - `repository` (optional): needed when the workflow is being triggered by a cron schedule. Not neccessary and not recommended when triggered manually. Use as follows:
   ```yaml
@@ -46,6 +46,8 @@ Note that this action receives 1 mandatory and 2 optional parameters:
   ```
 
 The workflow that calls it also needs `permissions: write-all` to being able to create the release, as it is in the example.
+
+> :warning: In this example we use the [GITHUB_TOKEN](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) but keep in mind that adding this token will prevent from other workflows to trigger upon this one. So if you need to trigger another workflow upon the creation of the release, you should add this job to that other workflow. Another solution would be using your own personal access token instead of `GITHUB_TOKEN` but we do not like having personal access tokens binded to our repositories due to security and availability reasons.
 
 ## How to run
 

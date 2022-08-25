@@ -3,7 +3,7 @@ import * as github from '@actions/github'
 import {Octokit} from '@octokit/rest'
 import {paginateRest} from '@octokit/plugin-paginate-rest'
 
-const semverRegexString = '^([0-9]+).([0-9]+).([0-9]+)$'
+const semverRegexString = '^([0-9]+)\.([0-9]+)\.([0-9]+)$'
 const parenthesisRegex = '(\(.+\))?'
 
 async function run(): Promise<void> {
